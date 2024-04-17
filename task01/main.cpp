@@ -67,6 +67,12 @@ void draw_polygon(
         float p1x = polygon_xy[i1_vtx * 2 + 0] - x;
         float p1y = polygon_xy[i1_vtx * 2 + 1] - y;
         // write a few lines of code to compute winding number (hint: use atan2)
+        float norm = sqrt(p0x * p0x + p0y * p0y) * sqrt(p1x * p1x + p1y * p1y);
+        float cos_theta = (p0x * p1x + p0y * p1y) / norm;
+        float sin_theta = (p0x * p1y - p1x * p0y) / norm;
+        float theta = atan2(sin_theta, cos_theta);
+        winding_number -= theta / 6.28;
+
       }
       const int int_winding_number = int(std::round(winding_number));
       if (int_winding_number == 1 ) { // if (x,y) is inside the polygon
@@ -93,6 +99,34 @@ void dda_line(
   auto dx = x1 - x0;
   auto dy = y1 - y0;
   // write some code below to paint pixel on the line with color `brightness`
+  float m = dy / dx;
+  float cur_x = x0;
+  float cur_y = y0;
+  while (1) {
+    int ih = int(std::round(cur_x));
+    int iw = int(std::round(cur_y));
+    img_data[ih*width + iw] = brightness;
+
+    if (fabs(m) < 1.) {
+      if (dx > 0) {
+        cur_x += 1;
+      } else {
+        cur_x -= 1;
+      }
+      cur_y += m;
+    } else {
+      cur_x += 1. / m;
+      if (dy > 0) {
+        cur_y += 1;
+      } else {
+        cur_y -= 1;
+      }
+    }
+
+    if (fabs(cur_x - x0) > fabs(x1 - x0) || fabs(cur_y - y0) > fabs(y1 - y0)) {
+      break;
+    }
+  }
 }
 
 int main() {
