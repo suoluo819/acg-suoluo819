@@ -70,6 +70,27 @@ void draw_3d_triangle_with_texture(
       Eigen::Matrix4f coeff;
       Eigen::Vector4f rhs;
 
+      Eigen::Translation3f transl(0., 0., -2.0);
+      Eigen::Matrix4f transM = Eigen::Affine3f(transl).matrix() * 
+                               camera_transformation().inverse();
+      Eigen::Vector4f q[3] = {q0, q1, q2};
+  
+      for (auto& qi : q) {
+          qi = transM * qi;
+          qi /= qi[3];
+      }
+      
+      coeff << q[0][0], q[1][0], q[2][0], 0.,
+               q[0][1], q[1][1], q[2][1], 0.,
+               -q[0][2], -q[1][2], -q[2][2], 0.,
+               1.0, 1.0, 1.0, 1.0;
+
+      rhs << s[0] * 0.55, s[1] * 0.55, 0.5,
+            -(bc.array() / Eigen::Vector3f(q[0][2], q[1][2], q[2][2]).array()).sum();
+      
+      Eigen::Vector4f bc_trans = coeff.colPivHouseholderQr().solve(rhs); 
+      bc = bc_trans.head(3) / bc_trans[3];
+
       // do not change below
       auto uv = uv0 * bc[0] + uv1 * bc[1] + uv2 * bc[2]; // uv coordinate of the pixel
       // compute pixel coordinate of the texture
