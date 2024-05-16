@@ -26,11 +26,12 @@ void main()
         // furthermore, make sure the occlusion is correctly computed for the reflected image.
         vec3 vertexPosition = vec3(x0, y0, z0);
 
-        vec3 reflection = vertexPosition - 2.0 * dot(vertexPosition, nrm) * nrm + org;
+        vec3 reflection = vertexPosition - 2.0 * dot(nrm, vertexPosition - org) * nrm;
 
         x0 = reflection.x;
         y0 = reflection.y;
-        z0 = reflection.z;
+        z0 = -0.5 + reflection.z / 100.0;
+
     }
     // do not edit below
 
