@@ -133,11 +133,29 @@ class HelloWorld(mglw.WindowConfig):
 
         # write a few line code below to implement laplacian mesh deformation
         # Problem 2: Laplacian deformation, which minimizes (x-x_def)D(x-x_def) + (x-x_ini)L(x-x_ini) w.r.t x,
+        
+        D = self.matrix_fix
+        L = self.matrix_laplace
+
+        # rhs = D @ self.vtx2xyz_def + L @ self.vtx2xyz_ini
+
+        # for i in range(self.vtx2xyz_ini.shape[1]):
+        #     self.vtx2xyz_def[:, i] = spsolve(D + L, rhs[:, i])
+        
         # Problem 3: Bi-Laplacian deformation, which minimizes (x-x_def)D(x-x_def) + (x-x_ini)L^2(x-x_ini) w.r.t x,
+
+        L2 = self.matrix_bilaplace
+
+        rhs = D @ self.vtx2xyz_def + L2 @ self.vtx2xyz_ini
+
+        for i in range(self.vtx2xyz_ini.shape[1]):
+            self.vtx2xyz_def[:, i] = spsolve(D + L2, rhs[:, i])
+        
         # where D is the diagonal matrix with entry 1 if the vertex is fixed, 0 if the vertex is free, a.k.a `self.matrix_fix`
         # L is the graph Laplacian matrix a.k.a `self.matrix_laplace`
         # you may use `spsolve` to solve the liner system
         # spsolve: https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.spsolve.html#scipy.sparse.linalg.spsolve
+
 
 
         # do not edit beyond here
